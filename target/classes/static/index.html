@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zone Management</title>
+</head>
+<body>
+
+<h2>Add Zone</h2>
+
+<input id="name" placeholder="Zone Name">
+<input id="brand" placeholder="Brand ID">
+<button onclick="addZone()">Add</button>
+
+<h2>Zone List</h2>
+<ul id="list"></ul>
+
+<script>
+function addZone() {
+    fetch("http://localhost:8080/zones", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            zoneName: document.getElementById("name").value,
+            brandId: document.getElementById("brand").value,
+            active: true
+        })
+    }).then(() => loadZones());
+}
+
+function loadZones() {
+    fetch("http://localhost:8080/zones")
+    .then(res => res.json())
+    .then(data => {
+        let list = document.getElementById("list");
+        list.innerHTML = "";
+        data.forEach(z => {
+            list.innerHTML += `<li>${z.zoneName} 
+                <button onclick="deleteZone(${z.zoneId})">Delete</button></li>`;
+        });
+    });
+}
+
+function deleteZone(id) {
+    fetch(`http://localhost:8080/zones/${id}`, {
+        method: "DELETE"
+    }).then(() => loadZones());
+}
+
+loadZones();
+</script>
+
+</body>
+</html>
